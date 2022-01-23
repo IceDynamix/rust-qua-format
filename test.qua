@@ -1,0 +1,25 @@
+---
+AudioFile: ""
+SongPreviewTime: 0
+BackgroundFile: ""
+BannerFile: ""
+MapId: -1
+MapSetId: -1
+GameMode: Keys4
+Title: Freedom Dive
+Artist: xi
+Source: ""
+Tags: ""
+Creator: ""
+DifficultyName: ""
+Description: ""
+Genre: ""
+BpmDoesNotAffectScrollVelocity: false
+InitialScrollVelocity: 1.0
+HasScratchKey: false
+EditorLayers: []
+CustomAudioSamples: []
+SoundEffects: []
+TimingPoints: []
+SliderVelocities: []
+HitObjects: []

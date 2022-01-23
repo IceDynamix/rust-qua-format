@@ -6,7 +6,6 @@ description = "A Rust library to parse .qua files"
 authors = ["IceDynamix"]
 repository = "https://github.com/IceDynamix/rust-qua-format"
 license = "MIT"
-license-file = "LICENSE"
 keywords = ["quaver", "vsrg", "map"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

@@ -1,4 +1,4 @@
-use std::{fs::File, path::Path};
+use std::{fs::File, path::Path, str::FromStr};
 
 use serde::Deserialize;
 
@@ -71,22 +71,26 @@ pub struct Qua {
 }
 
 impl Qua {
-    fn from_file<P: AsRef<Path>>(path: P) -> Result<Qua, QuaError> {
+    pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Qua, QuaError> {
         let path = Path::new(path.as_ref());
         let file = File::open(path).map_err(QuaError::IoError)?;
         let qua = Qua::from_reader(file)?;
         Ok(qua)
     }
 
-    fn from_reader<R>(reader: R) -> Result<Qua, QuaError>
+    pub fn from_reader<R>(reader: R) -> Result<Qua, QuaError>
     where
         R: std::io::Read,
     {
         let qua: Qua = serde_yaml::from_reader(reader).map_err(QuaError::SerdeError)?;
         Ok(qua)
     }
+}
 
-    fn from_str(s: &str) -> Result<Qua, QuaError> {
+impl FromStr for Qua {
+    type Err = QuaError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         let qua: Qua = serde_yaml::from_str(s).map_err(QuaError::SerdeError)?;
         Ok(qua)
     }
@@ -130,7 +134,7 @@ pub enum GameMode {
 }
 
 impl GameMode {
-    fn from_key_count(key_count: i32) -> Option<GameMode> {
+    pub fn from_key_count(key_count: i32) -> Option<GameMode> {
         match key_count {
             4 => Some(GameMode::Keys4),
             7 => Some(GameMode::Keys7),
@@ -138,7 +142,7 @@ impl GameMode {
         }
     }
 
-    fn get_key_count(self) -> i32 {
+    pub fn get_key_count(self) -> i32 {
         match self {
             GameMode::Keys4 => 4,
             GameMode::Keys7 => 7,

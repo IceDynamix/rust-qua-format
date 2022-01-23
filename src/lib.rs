@@ -1,4 +1,12 @@
+use std::{fs::File, path::Path};
+
 use serde::Deserialize;
+
+#[derive(Debug)]
+pub enum QuaError {
+    IoError(std::io::Error),
+    SerdeError(serde_yaml::Error),
+}
 
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -63,11 +71,18 @@ pub struct Qua {
 }
 
 impl Qua {
-    fn from_reader<R>(reader: R) -> Result<Qua, serde_yaml::Error>
+    fn from_file<P: AsRef<Path>>(path: P) -> Result<Qua, QuaError> {
+        let path = Path::new(path.as_ref());
+        let file = File::open(path).map_err(QuaError::IoError)?;
+        let qua = Qua::from_reader(file)?;
+        Ok(qua)
+    }
+
+    fn from_reader<R>(reader: R) -> Result<Qua, QuaError>
     where
         R: std::io::Read,
     {
-        let qua: Qua = serde_yaml::from_reader(reader)?;
+        let qua: Qua = serde_yaml::from_reader(reader).map_err(QuaError::SerdeError)?;
         Ok(qua)
     }
 }
@@ -285,13 +300,10 @@ impl Default for KeySoundInfo {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::{fs::File, path::Path};
 
     #[test]
     fn test_read() {
-        let path = Path::new("./map_files/1416.qua");
-        let file = File::open(path).expect("Could not read file");
-        let qua = Qua::from_reader(file).expect("Could not parse qua");
+        let qua = Qua::from_file("./map_files/1416.qua").expect("Could not parse qua");
 
         assert_eq!("Csikos Post", qua.title);
         assert_eq!("zetoban", qua.artist);

@@ -6,13 +6,18 @@
 //!
 //! ```no_run
 //! use qua_format::Qua;
+//! use std::fs::File;
 //!
 //! let path = "123.qua";
-//! let qua = Qua::from_file(path).expect("Could not parse qua file");
+//! let mut qua = Qua::from_file(path).expect("Could not parse qua file");
+//! qua.title = "Never Gonna Give You Up".to_string();
+//!
+//! let new_file = File::create("test.qua").expect("Could not create new file");
+//! qua.to_writer(new_file).expect("Could not write to file");
 //! ```
 
-use serde::Deserialize;
-use std::{fs::File, path::Path, str::FromStr};
+use serde::{Deserialize, Serialize};
+use std::{fmt::Display, fs::File, path::Path, str::FromStr};
 
 /// Error while parsing a qua file
 #[derive(Debug)]
@@ -25,7 +30,7 @@ pub enum QuaError {
 ///
 /// Hitsounds are not considered for now.
 /// Genre is unused, but does exist in the format.
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct Qua {
@@ -88,6 +93,14 @@ pub struct Qua {
 }
 
 impl Qua {
+    /// Parse a file to a Qua struct
+    ///
+    /// ```no_run
+    /// use qua_format::Qua;
+    ///
+    /// let path = "123.qua";
+    /// let mut qua = Qua::from_file(path).expect("Could not parse qua file");
+    /// ```
     pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Qua, QuaError> {
         let path = Path::new(path.as_ref());
         let file = File::open(path).map_err(QuaError::IoError)?;
@@ -95,12 +108,28 @@ impl Qua {
         Ok(qua)
     }
 
+    /// Parse data from a reader to a Qua struct
     pub fn from_reader<R>(reader: R) -> Result<Qua, QuaError>
     where
         R: std::io::Read,
     {
         let qua: Qua = serde_yaml::from_reader(reader).map_err(QuaError::SerdeError)?;
         Ok(qua)
+    }
+
+    /// Write the Qua struct to a writer
+    ///
+    /// ```
+    /// let new_path = "test.qua";
+    /// let new_file = File::create(&new_path).expect("Could not create new file");
+    /// qua.to_writer(new_file).expect("Could not write to file");
+    /// ```
+    pub fn to_writer<W>(&self, writer: W) -> Result<(), QuaError>
+    where
+        W: std::io::Write,
+    {
+        serde_yaml::to_writer(writer, self).map_err(QuaError::SerdeError)?;
+        Ok(())
     }
 }
 
@@ -110,6 +139,13 @@ impl FromStr for Qua {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let qua: Qua = serde_yaml::from_str(s).map_err(QuaError::SerdeError)?;
         Ok(qua)
+    }
+}
+
+impl Display for Qua {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = serde_yaml::to_string(self).map_err(|_| std::fmt::Error)?;
+        write!(f, "{}", s)
     }
 }
 
@@ -145,7 +181,7 @@ impl Default for Qua {
 }
 
 /// Game mode of the map
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub enum GameMode {
     Keys4 = 1,
     Keys7 = 2,
@@ -171,7 +207,7 @@ impl GameMode {
 /// Editor layers to separate notes into different layers.
 ///
 /// Color is provided in rrr,ggg,bbb format.
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct EditorLayerInfo {
@@ -194,7 +230,7 @@ impl Default for EditorLayerInfo {
 }
 
 /// Custom audio samples that can be assigned to different hit objects
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct CustomAudioSampleInfo {
@@ -214,7 +250,7 @@ impl Default for CustomAudioSampleInfo {
 }
 
 /// Sound effect played at a specific moment in time
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct SoundEffectInfo {
@@ -241,7 +277,7 @@ impl Default for SoundEffectInfo {
 /// If bpm_does_not_affect_scroll_velocity is true, then
 /// the BPM will scale the scroll velocity of the map in relation to its base BPM.
 /// If there is an existing scroll velocity, then it will be overridden.
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct TimingPointInfo {
@@ -269,7 +305,7 @@ impl Default for TimingPointInfo {
 /// A moment in time where the scroll velocity changes
 ///
 /// Will be overridden by following timing points
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ScrollVelocityInfo {
     /// The time in milliseconds when the new SliderVelocity section begins
@@ -279,7 +315,7 @@ pub struct ScrollVelocityInfo {
 }
 
 /// Time signature of the song
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub enum TimeSignature {
     Quadruple = 4,
     Triple = 3,
@@ -288,7 +324,7 @@ pub enum TimeSignature {
 /// A note to be played in-game
 ///
 /// A long note will have an end_time > 0.
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct HitObjectInfo {
@@ -321,7 +357,7 @@ impl Default for HitObjectInfo {
 }
 
 /// Key sounds that are played for a specific note with a given volume
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct KeySoundInfo {
@@ -342,11 +378,14 @@ impl Default for KeySoundInfo {
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+
     use super::*;
 
     #[test]
     fn test_read() {
-        let qua = Qua::from_file("./map_files/1416.qua").expect("Could not parse qua");
+        let path = "./map_files/1416.qua";
+        let qua = Qua::from_file(path).expect("Could not parse qua");
 
         assert_eq!("Csikos Post", qua.title);
         assert_eq!("zetoban", qua.artist);
@@ -362,5 +401,34 @@ mod tests {
         assert!(!qua.bpm_does_not_affect_scroll_velocity); // Default value
 
         assert_eq!(4, qua.game_mode.get_key_count());
+    }
+
+    #[test]
+    fn test_write() {
+        let qua = Qua {
+            title: "Freedom Dive".to_string(),
+            artist: "xi".to_string(),
+            ..Default::default()
+        };
+
+        let new_path = "test.qua";
+        let new_file = File::create(&new_path).expect("Could not create new file");
+        qua.to_writer(new_file).expect("Could not write to file");
+
+        fs::remove_file(&new_path).expect("Could not remove file");
+    }
+
+    #[test]
+    fn test_read_write() {
+        let path = "./map_files/1416.qua";
+        let mut qua = Qua::from_file(path).expect("Could not parse qua");
+
+        qua.title = "Freedom Dive".to_string();
+
+        let new_path = "test.qua";
+        let new_file = File::create(&new_path).expect("Could not create new file");
+        qua.to_writer(new_file).expect("Could not write to file");
+
+        fs::remove_file(&new_path).expect("Could not remove file");
     }
 }

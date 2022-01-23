@@ -85,6 +85,11 @@ impl Qua {
         let qua: Qua = serde_yaml::from_reader(reader).map_err(QuaError::SerdeError)?;
         Ok(qua)
     }
+
+    fn from_str(s: &str) -> Result<Qua, QuaError> {
+        let qua: Qua = serde_yaml::from_str(s).map_err(QuaError::SerdeError)?;
+        Ok(qua)
+    }
 }
 
 impl Default for Qua {

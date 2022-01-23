@@ -1,13 +1,30 @@
-use std::{fs::File, path::Path, str::FromStr};
+//! Parse .qua files into structs
+//!
+//! The .qua file format uses the YAML format, so serde_yaml is used for parsing.
+//!
+//! # Examples
+//!
+//! ```no_run
+//! use qua_format::Qua;
+//!
+//! let path = "123.qua";
+//! let qua = Qua::from_file(path).expect("Could not parse qua file");
+//! ```
 
 use serde::Deserialize;
+use std::{fs::File, path::Path, str::FromStr};
 
+/// Error while parsing a qua file
 #[derive(Debug)]
 pub enum QuaError {
     IoError(std::io::Error),
     SerdeError(serde_yaml::Error),
 }
 
+/// Represents the .qua file format
+///
+/// Hitsounds are not considered for now.
+/// Genre is unused, but does exist in the format.
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
@@ -127,6 +144,7 @@ impl Default for Qua {
     }
 }
 
+/// Game mode of the map
 #[derive(Deserialize)]
 pub enum GameMode {
     Keys4 = 1,
@@ -150,6 +168,9 @@ impl GameMode {
     }
 }
 
+/// Editor layers to separate notes into different layers.
+///
+/// Color is provided in rrr,ggg,bbb format.
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
@@ -172,7 +193,7 @@ impl Default for EditorLayerInfo {
     }
 }
 
-/// CustomAudioSamples section of the .qua
+/// Custom audio samples that can be assigned to different hit objects
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
@@ -192,6 +213,7 @@ impl Default for CustomAudioSampleInfo {
     }
 }
 
+/// Sound effect played at a specific moment in time
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
@@ -214,7 +236,11 @@ impl Default for SoundEffectInfo {
     }
 }
 
-/// TimingPoints section of the .qua
+/// A moment in time where the BPM of a song changes
+///
+/// If bpm_does_not_affect_scroll_velocity is true, then
+/// the BPM will scale the scroll velocity of the map in relation to its base BPM.
+/// If there is an existing scroll velocity, then it will be overridden.
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
@@ -240,7 +266,9 @@ impl Default for TimingPointInfo {
     }
 }
 
-/// SliderVelocities section of the .qua
+/// A moment in time where the scroll velocity changes
+///
+/// Will be overridden by following timing points
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ScrollVelocityInfo {
@@ -250,12 +278,16 @@ pub struct ScrollVelocityInfo {
     pub multiplier: f32,
 }
 
+/// Time signature of the song
 #[derive(Deserialize)]
 pub enum TimeSignature {
     Quadruple = 4,
     Triple = 3,
 }
 
+/// A note to be played in-game
+///
+/// A long note will have an end_time > 0.
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
@@ -271,7 +303,7 @@ pub struct HitObjectInfo {
     pub hit_sound: u8,
     /// Key sounds to play when this object is hit.
     pub key_sounds: Vec<KeySoundInfo>,
-    /// The layer in the editor that the object belongs to.
+    /// The layer in the editor that the object belongs to (index in the array).
     pub editor_layer: i32,
 }
 
@@ -288,12 +320,14 @@ impl Default for HitObjectInfo {
     }
 }
 
-/// KeySounds property of hit objects.
+/// Key sounds that are played for a specific note with a given volume
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct KeySoundInfo {
+    /// Index in the CustomAudioSamples array
     pub sample: i32,
+    /// How loud the sound is played (0-100)
     pub volume: i32,
 }
 

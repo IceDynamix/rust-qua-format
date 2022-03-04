@@ -291,7 +291,7 @@ impl Default for SoundEffectInfo {
 #[serde(default)]
 pub struct TimingPointInfo {
     /// The time in milliseconds for when this timing point begins
-    pub start_time: i32,
+    pub start_time: f32,
     /// The BPM during this timing point
     pub bpm: f32,
     /// The signature during this timing point
@@ -303,7 +303,7 @@ pub struct TimingPointInfo {
 impl Default for TimingPointInfo {
     fn default() -> Self {
         Self {
-            start_time: 0,
+            start_time: 0.0,
             bpm: 0.0,
             signature: TimeSignature::Quadruple,
             hidden: false,

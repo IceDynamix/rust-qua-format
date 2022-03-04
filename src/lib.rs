@@ -18,6 +18,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::{fmt::Display, fs::File, path::Path, str::FromStr};
+use serde_repr::*;
 
 /// Error while parsing a qua file
 #[derive(Debug)]
@@ -47,6 +48,7 @@ pub struct Qua {
     /// The unique Map Set identifier (-1 if not submitted)
     pub map_set_id: i32,
     /// The game mode for this map
+    #[serde(rename = "mode")]
     pub game_mode: GameMode,
     /// The title of the song
     pub title: String,
@@ -110,8 +112,8 @@ impl Qua {
 
     /// Parse data from a reader to a Qua struct
     pub fn from_reader<R>(reader: R) -> Result<Qua, QuaError>
-    where
-        R: std::io::Read,
+        where
+            R: std::io::Read,
     {
         let qua: Qua = serde_yaml::from_reader(reader).map_err(QuaError::SerdeError)?;
         Ok(qua)
@@ -134,8 +136,8 @@ impl Qua {
     /// qua.to_writer(new_file).expect("Could not write to file");
     /// ```
     pub fn to_writer<W>(&self, writer: W) -> Result<(), QuaError>
-    where
-        W: std::io::Write,
+        where
+            W: std::io::Write,
     {
         serde_yaml::to_writer(writer, self).map_err(QuaError::SerdeError)?;
         Ok(())
@@ -190,7 +192,8 @@ impl Default for Qua {
 }
 
 /// Game mode of the map
-#[derive(Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Serialize_repr, Deserialize_repr, Clone, PartialEq)]
+#[repr(u8)]
 pub enum GameMode {
     Keys4 = 1,
     Keys7 = 2,
@@ -324,7 +327,8 @@ pub struct ScrollVelocityInfo {
 }
 
 /// Time signature of the song
-#[derive(Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Serialize_repr, Deserialize_repr, Clone, PartialEq)]
+#[repr(u8)]
 pub enum TimeSignature {
     Quadruple = 4,
     Triple = 3,

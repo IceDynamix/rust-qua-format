@@ -48,7 +48,7 @@ pub struct Qua {
     /// The unique Map Set identifier (-1 if not submitted)
     pub map_set_id: i32,
     /// The game mode for this map
-    #[serde(rename = "mode")]
+    #[serde(rename = "Mode")]
     pub game_mode: GameMode,
     /// The title of the song
     pub title: String,

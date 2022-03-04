@@ -192,8 +192,7 @@ impl Default for Qua {
 }
 
 /// Game mode of the map
-#[derive(Serialize_repr, Deserialize_repr, Clone, PartialEq)]
-#[repr(u8)]
+#[derive(Serialize, Deserialize, Clone, PartialEq)]
 pub enum GameMode {
     Keys4 = 1,
     Keys7 = 2,

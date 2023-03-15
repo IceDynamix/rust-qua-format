@@ -57,7 +57,7 @@ impl Display for QuaError {
 ///
 /// Hitsounds are not considered for now.
 /// Genre is unused, but does exist in the format.
-#[derive(Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct Qua {
@@ -224,7 +224,7 @@ impl Default for Qua {
 }
 
 /// Game mode of the map
-#[derive(Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
 pub enum GameMode {
     Keys4 = 1,
     Keys7 = 2,
@@ -250,7 +250,7 @@ impl GameMode {
 /// Editor layers to separate notes into different layers.
 ///
 /// Color is provided in rrr,ggg,bbb format.
-#[derive(Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct EditorLayerInfo {
@@ -273,7 +273,7 @@ impl Default for EditorLayerInfo {
 }
 
 /// Custom audio samples that can be assigned to different hit objects
-#[derive(Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct CustomAudioSampleInfo {
@@ -293,7 +293,7 @@ impl Default for CustomAudioSampleInfo {
 }
 
 /// Sound effect played at a specific moment in time
-#[derive(Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct SoundEffectInfo {
@@ -320,7 +320,7 @@ impl Default for SoundEffectInfo {
 /// If bpm_does_not_affect_scroll_velocity is true, then
 /// the BPM will scale the scroll velocity of the map in relation to its base BPM.
 /// If there is an existing scroll velocity, then it will be overridden.
-#[derive(Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct TimingPointInfo {
@@ -348,7 +348,7 @@ impl Default for TimingPointInfo {
 /// A moment in time where the scroll velocity changes
 ///
 /// Will be overridden by following timing points
-#[derive(Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct ScrollVelocityInfo {
     /// The time in milliseconds when the new SliderVelocity section begins
@@ -358,7 +358,7 @@ pub struct ScrollVelocityInfo {
 }
 
 /// Time signature of the song
-#[derive(Serialize_repr, Deserialize_repr, Clone, PartialEq)]
+#[derive(Serialize_repr, Deserialize_repr, Clone, PartialEq, Debug)]
 #[repr(u8)]
 pub enum TimeSignature {
     Quadruple = 4,
@@ -368,7 +368,7 @@ pub enum TimeSignature {
 /// A note to be played in-game
 ///
 /// A long note will have an end_time > 0.
-#[derive(Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct HitObjectInfo {
@@ -401,7 +401,7 @@ impl Default for HitObjectInfo {
 }
 
 /// Key sounds that are played for a specific note with a given volume
-#[derive(Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "PascalCase")]
 #[serde(default)]
 pub struct KeySoundInfo {

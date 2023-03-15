@@ -17,8 +17,8 @@
 //! ```
 
 use serde::{Deserialize, Serialize};
-use std::{fmt::Display, fs::File, path::Path, str::FromStr};
 use serde_repr::*;
+use std::{fmt::Display, fs::File, path::Path, str::FromStr};
 
 /// Error while parsing a qua file
 #[derive(Debug)]
@@ -112,10 +112,16 @@ impl Qua {
 
     /// Parse data from a reader to a Qua struct
     pub fn from_reader<R>(reader: R) -> Result<Qua, QuaError>
-        where
-            R: std::io::Read,
+    where
+        R: std::io::Read,
     {
         let qua: Qua = serde_yaml::from_reader(reader).map_err(QuaError::SerdeError)?;
+        Ok(qua)
+    }
+
+    /// Parse data from a byte slice to a Qua struct
+    pub fn from_slice(bytes: &[u8]) -> Result<Qua, QuaError> {
+        let qua: Qua = serde_yaml::from_slice(bytes).map_err(QuaError::SerdeError)?;
         Ok(qua)
     }
 
@@ -136,8 +142,8 @@ impl Qua {
     /// qua.to_writer(new_file).expect("Could not write to file");
     /// ```
     pub fn to_writer<W>(&self, writer: W) -> Result<(), QuaError>
-        where
-            W: std::io::Write,
+    where
+        W: std::io::Write,
     {
         serde_yaml::to_writer(writer, self).map_err(QuaError::SerdeError)?;
         Ok(())

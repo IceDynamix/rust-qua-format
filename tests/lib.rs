@@ -14,7 +14,7 @@ mod tests {
         assert_eq!(1416, qua.map_id);
 
         assert_eq!(1, qua.timing_points.len());
-        assert_eq!(0, qua.timing_points[0].start_time); // Default value
+        assert_eq!(0., qua.timing_points[0].start_time); // Default value
 
         assert_eq!(167, qua.hit_objects.len());
         assert_eq!(0, qua.hit_objects[0].start_time); // Default value

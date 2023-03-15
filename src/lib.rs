@@ -18,13 +18,39 @@
 
 use serde::{Deserialize, Serialize};
 use serde_repr::*;
-use std::{fmt::Display, fs::File, path::Path, str::FromStr};
+use std::{error::Error, fmt::Display, fs::File, path::Path, str::FromStr};
 
 /// Error while parsing a qua file
 #[derive(Debug)]
 pub enum QuaError {
     IoError(std::io::Error),
     SerdeError(serde_yaml::Error),
+}
+
+impl Error for QuaError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match &self {
+            QuaError::IoError(x) => Some(x),
+            QuaError::SerdeError(x) => Some(x),
+        }
+    }
+
+    fn description(&self) -> &str {
+        "description() is deprecated; use Display"
+    }
+
+    fn cause(&self) -> Option<&dyn Error> {
+        self.source()
+    }
+}
+
+impl Display for QuaError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            QuaError::IoError(x) => x.fmt(f),
+            QuaError::SerdeError(x) => x.fmt(f),
+        }
+    }
 }
 
 /// Represents the .qua file format

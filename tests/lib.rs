@@ -34,10 +34,10 @@ mod tests {
         };
 
         let new_path = "test.qua";
-        let new_file = File::create(&new_path).expect("Could not create new file");
+        let new_file = File::create(new_path).expect("Could not create new file");
         qua.to_writer(new_file).expect("Could not write to file");
 
-        fs::remove_file(&new_path).expect("Could not remove file");
+        fs::remove_file(new_path).expect("Could not remove file");
     }
 
     #[test]
@@ -48,9 +48,9 @@ mod tests {
         qua.title = "Freedom Dive".to_string();
 
         let new_path = "test.qua";
-        let new_file = File::create(&new_path).expect("Could not create new file");
+        let new_file = File::create(new_path).expect("Could not create new file");
         qua.to_writer(new_file).expect("Could not write to file");
 
-        fs::remove_file(&new_path).expect("Could not remove file");
+        fs::remove_file(new_path).expect("Could not remove file");
     }
 }
